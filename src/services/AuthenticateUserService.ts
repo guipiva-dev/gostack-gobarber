@@ -11,7 +11,7 @@ interface Request {
 }
 
 interface Response {
-  user: User;
+  user: Omit<User, 'password'>;
   token: string;
 }
 
@@ -32,7 +32,14 @@ export default class AuthenticateUserService {
       throw Error('Email or password is incorrect.');
     }
 
-    delete user.password;
+    const userWithoutPassword = {
+      id: user.id,
+      name: user.name,
+      email: user.email,
+      created_at: user.created_at,
+      updated_at: user.updated_at,
+      avatar: user.avatar,
+    };
 
     const { secret, expiresIn } = authConfig.jwt;
 
@@ -41,6 +48,6 @@ export default class AuthenticateUserService {
       expiresIn,
     });
 
-    return { user, token };
+    return { user: userWithoutPassword, token };
   }
 }
